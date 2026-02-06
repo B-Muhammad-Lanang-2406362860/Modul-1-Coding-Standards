@@ -28,6 +28,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public boolean delete(String productId){
+        productRepository.delete(productId);
+        System.out.println(productId+" sudah di delete");
+        return true;
+    }
+
+    @Override
     public Product findProductById(String queryUUID){
         Product product = productRepository.findById(queryUUID);
         return product;

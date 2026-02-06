@@ -30,6 +30,14 @@ public class ProductRepository {
         return product;
     }
 
+    public boolean delete(String productId){
+        Product product = this.findById(productId);
+        if (product != null) {
+            this.productData.remove(product);
+        }
+        return true;
+    }
+
     public Product findById(String queryUUID){
         for(Product product: productData){
             String currentProductUUID = product.getProductId();
