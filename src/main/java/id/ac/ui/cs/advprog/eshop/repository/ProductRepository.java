@@ -12,36 +12,34 @@ import java.util.UUID;
 public class ProductRepository {
     private List<Product> productData = new ArrayList<>();
 
-    public Product create(Product product){
+    public void create(Product product){
         UUID uuid = UUID.randomUUID();
         String uuidString = uuid.toString();
+
         product.setProductId(uuidString);
         productData.add(product);
-        return product;
     }
 
-    public Product edit(Product product){
-        String productUUID = product.getProductId();
-        Product productFromRepo = this.findById(productUUID);
+    public void edit(Product product){
+        String productId = product.getProductId();
+        Product productFromRepo = this.findById(productId);
+
         if (productFromRepo != null) {
             productFromRepo.setProductName(product.getProductName());
             productFromRepo.setProductQuantity(product.getProductQuantity());
         }
-        return product;
     }
 
-    public boolean delete(String productId){
-        Product product = this.findById(productId);
+    public void delete(Product product){
         if (product != null) {
             this.productData.remove(product);
         }
-        return true;
     }
 
-    public Product findById(String queryUUID){
+    public Product findById(String productId){
         for(Product product: productData){
-            String currentProductUUID = product.getProductId();
-            if (currentProductUUID.equals(queryUUID)){
+            String currentProductId = product.getProductId();
+            if (currentProductId.equals(productId)){
                 return product;
             }
         }
