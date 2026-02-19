@@ -1,12 +1,11 @@
-name: SonarCloud
+name: Build and SonarCloud
 
 on:
   push:
   pull_request:
 
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,19 +18,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'gradle'
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          cache: gradle
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build and Analyze
-        run: ./gradlew build sonar
+      - name: Build, Test, and Analyze
+        run: ./gradlew clean build jacocoTestReport sonarqube --info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
