@@ -2,8 +2,6 @@ name: SonarCloud
 
 on:
   push:
-    branches:
-      - main
   pull_request:
 
 jobs:
@@ -21,6 +19,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       - name: Make gradlew executable
         run: chmod +x gradlew
