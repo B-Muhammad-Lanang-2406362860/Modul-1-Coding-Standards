@@ -20,9 +20,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+      - name: Build and Analyze
+        run: ./gradlew build sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
