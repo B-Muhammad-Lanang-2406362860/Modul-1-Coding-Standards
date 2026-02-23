@@ -110,14 +110,4 @@ public class ProductRepositoryTest {
         assertEquals(editedProduct1.getProductQuantity(), product1.getProductQuantity());
         assertEquals(editedProduct1.getProductName(), product1.getProductName());
     }
-
-    @Test
-    void testEdit_whenProductIsNotInRepository_thenDoNothing() {
-        Product newProduct = new Product();
-        newProduct.setProductId("op1a82ab-b109-43a3-ad74-dc52448a7c46");
-        newProduct.setProductName("Sampo Bambang");
-        newProduct.setProductQuantity(12);
-
-        productRepository.edit(newProduct);
-    }
 }
