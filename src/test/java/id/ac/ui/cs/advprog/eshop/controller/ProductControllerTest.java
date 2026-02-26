@@ -69,7 +69,7 @@ class ProductControllerTest {
         Product product = new Product();
         product.setProductId("1");
 
-        when(service.findProductById("1")).thenReturn(product);
+        when(service.findById("1")).thenReturn(product);
 
         mockMvc.perform(get("/product/edit/1"))
                 .andExpect(status().isOk())
@@ -81,7 +81,7 @@ class ProductControllerTest {
     @Test
     void editProductPageRedirectsWhenProductNotFound() throws Exception {
 
-        when(service.findProductById("99"))
+        when(service.findById("99"))
                 .thenThrow(new RuntimeException("Not found"));
 
         mockMvc.perform(get("/product/edit/99"))

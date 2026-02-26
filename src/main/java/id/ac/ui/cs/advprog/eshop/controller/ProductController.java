@@ -1,6 +1,8 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
+import id.ac.ui.cs.advprog.eshop.model.Car;
 import id.ac.ui.cs.advprog.eshop.model.Product;
+import id.ac.ui.cs.advprog.eshop.service.CarServiceImpl;
 import id.ac.ui.cs.advprog.eshop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,46 +28,27 @@ public class ProductController {
 
     @PostMapping("/create")
     public String createProductPost(@ModelAttribute Product product, Model model){
-        try {
-            service.create(product);
-        } catch (IllegalArgumentException exception) {
-            model.addAttribute("errorMessage", exception.getMessage());
-            return "CreateProduct";
-        }
+        service.create(product);
         return "redirect:list";
     }
 
     @GetMapping("/edit/{productId}")
     public String editProductPage(@PathVariable String productId, RedirectAttributes redirectAttributes, Model model){
-        Product product;
-        try {
-            product = service.findProductById(productId);
-        } catch (Exception exception) {
-            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
-            return "redirect:/product/list";
-        }
+        Product product = service.findById(productId);
         model.addAttribute("product", product);
         return "EditProduct";
     }
 
     @PostMapping("/edit")
     public String editProductPost(@ModelAttribute Product product, RedirectAttributes redirectAttributes, Model model){
-        try {
-            service.edit(product);
-        } catch (Exception exception) {
-            model.addAttribute("errorMessage", exception.getMessage());
-            return "EditProduct";
-        }
+        System.out.println(product.getProductId());
+        service.edit(product);
         return "redirect:list";
     }
 
     @PostMapping("/delete/{productId}")
     public String deleteProductPost(@PathVariable String productId, RedirectAttributes redirectAttributes, Model model){
-        try {
-            service.delete(productId);
-        } catch (Exception exception) {
-            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
-        }
+        service.delete(productId);
         return "redirect:/product/list";
     }
 
@@ -75,5 +58,52 @@ public class ProductController {
         model.addAttribute("products", allProducts);
         return "ProductList";
     }
+}
 
+@Controller
+@RequestMapping("/car")
+class CarController extends ProductController {
+    @Autowired
+    private CarServiceImpl carservice;
+
+    @GetMapping("/createCar")
+    public String createCarPage(Model model) {
+        Car car = new Car();
+        model.addAttribute("car", car);
+        return "createCar";
+    }
+
+    @PostMapping("/createCar")
+    public String createCarPost(@ModelAttribute Car car, Model model){
+        carservice.create(car);
+        return "redirect:listCar";
+    }
+
+    @GetMapping("/listCar")
+    public String carListPage(Model model){
+        List<Car> allCars = carservice.findAll();
+        model.addAttribute("cars", allCars);
+        return "carList";
+    }
+
+    @GetMapping("/editCar/{carId}")
+    public String editCarPage(@PathVariable String carId, Model model){
+        Car car = carservice.findById(carId);
+        model.addAttribute("car", car);
+        return "editCar";
+    }
+
+    @PostMapping("/editCar")
+    public String editCarPost(@ModelAttribute Car car, Model model){
+        System.out.println(car.getCarId());
+        carservice.update(car.getCarId(), car);
+
+        return "redirect:listCar";
+    }
+
+    @PostMapping("/deleteCar")
+    public String deleteCar(@RequestParam("carId") String carId) {
+        carservice.deleteCarById(carId);
+        return "redirect:listCar";
+    }
 }
