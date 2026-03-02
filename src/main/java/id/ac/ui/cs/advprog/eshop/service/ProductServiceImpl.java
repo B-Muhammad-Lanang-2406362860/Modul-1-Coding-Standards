@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl implements ProductManagementService, ReadOnlyProductService {
 
     @Autowired
     private ProductRepository productRepository;

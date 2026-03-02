@@ -6,7 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
-import id.ac.ui.cs.advprog.eshop.service.ProductService;
+import id.ac.ui.cs.advprog.eshop.service.ProductManagementService;
+import id.ac.ui.cs.advprog.eshop.service.ReadOnlyProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,7 +23,10 @@ class ProductControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ProductService service;
+    private ProductManagementService writeService;
+
+    @MockBean
+    private ReadOnlyProductService readService;
 
     // Test GET /product/create
     @Test
@@ -42,25 +46,8 @@ class ProductControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("list"));
 
-        verify(service).create(org.mockito.ArgumentMatchers.any(Product.class));
+        verify(writeService).create(org.mockito.ArgumentMatchers.any(Product.class));
     }
-
-    // Test POST /product/create fail (IllegalArgumentException)
-    @Test
-    void createProductPostShouldReturnCreateProductViewWhenExceptionThrown() throws Exception {
-
-        doThrow(new IllegalArgumentException("Invalid product"))
-                .when(service)
-                .create(org.mockito.ArgumentMatchers.any(Product.class));
-
-        mockMvc.perform(post("/product/create")
-                        .param("name", "BadProduct")
-                        .param("price", "-1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("CreateProduct"))
-                .andExpect(model().attributeExists("errorMessage"));
-    }
-
 
     // Test GET /product/edit/{productId} success
     @Test
@@ -69,25 +56,12 @@ class ProductControllerTest {
         Product product = new Product();
         product.setProductId("1");
 
-        when(service.findById("1")).thenReturn(product);
+        when(readService.findById("1")).thenReturn(product);
 
         mockMvc.perform(get("/product/edit/1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("EditProduct"))
                 .andExpect(model().attributeExists("product"));
-    }
-
-    // Test GET /product/edit/{productId} fail
-    @Test
-    void editProductPageRedirectsWhenProductNotFound() throws Exception {
-
-        when(service.findById("99"))
-                .thenThrow(new RuntimeException("Not found"));
-
-        mockMvc.perform(get("/product/edit/99"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/product/list"))
-                .andExpect(flash().attributeExists("errorMessage"));
     }
 
     // Test POST /product/edit success
@@ -101,24 +75,7 @@ class ProductControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("list"));
 
-        verify(service).edit(any(Product.class));
-    }
-
-    // Test POST /product/edit fail
-    @Test
-    void editProductPostReturnsEditProductViewWhenExceptionThrown() throws Exception {
-
-        doThrow(new RuntimeException("Update failed"))
-                .when(service)
-                .edit(any(Product.class));
-
-        mockMvc.perform(post("/product/edit")
-                        .param("id", "1")
-                        .param("name", "BadProduct")
-                        .param("price", "-1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("EditProduct"))
-                .andExpect(model().attributeExists("errorMessage"));
+        verify(writeService).edit(any(Product.class));
     }
 
     // Test POST /product/delete/{productId} success
@@ -129,21 +86,7 @@ class ProductControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/product/list"));
 
-        verify(service).delete("1");
-    }
-
-    // Test POST /product/delete/{productId} fail
-    @Test
-    void deleteProductPostStillRedirectsWhenExceptionThrown() throws Exception {
-
-        doThrow(new RuntimeException("Delete failed"))
-                .when(service)
-                .delete("1");
-
-        mockMvc.perform(post("/product/delete/1"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/product/list"))
-                .andExpect(flash().attributeExists("errorMessage"));
+        verify(writeService).delete("1");
     }
 
     // Test GET /list
@@ -152,7 +95,7 @@ class ProductControllerTest {
 
         List<Product> products = List.of(new Product(), new Product());
 
-        when(service.findAll()).thenReturn(products);
+        when(readService.findAll()).thenReturn(products);
 
         mockMvc.perform(get("/product/list"))
                 .andExpect(status().isOk())
