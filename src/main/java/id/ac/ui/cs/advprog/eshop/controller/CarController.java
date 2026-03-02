@@ -24,7 +24,7 @@ public class CarController {
     public String createCarPage(Model model) {
         Car car = new Car();
         model.addAttribute("car", car);
-        return "createCar";
+        return "CreateCar";
     }
 
     @PostMapping("/createCar")
@@ -44,7 +44,7 @@ public class CarController {
     public String editCarPage(@PathVariable String carId, Model model){
         Car car = readService.findById(carId);
         model.addAttribute("car", car);
-        return "editCar";
+        return "EditCar";
     }
 
     @PostMapping("/editCar")
