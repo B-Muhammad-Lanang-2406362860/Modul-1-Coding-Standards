@@ -67,7 +67,7 @@ public class OrderTest {
         assertThrows(IllegalArgumentException.class, () -> {
             Order order = new Order("31342159-9d9f-4ab0-879f-531a580a5594", 
                 this.products, 1708560000L, "Safira Sudrajat", "MEOW");
-        })
+        });
     }
 
     @Test
